@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Meal Planner</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+
+<body>
+
+    <nav>
+        <a href="/">Home</a>
+        <a href="/recipes">Browse Recipes</a>
+        <a href="/add-recipe">Add Recipe</a>
+        <a href="/favorites">Favorites</a>
+        <a href="/meal-planner">Meal Planner</a>
+    </nav>
+
+    <header>
+        <h1>Meal Planner</h1>
+        <p>Plan your meals for the week.</p>
+    </header>
+
+    <main>
+
+        {% if plan %}
+            <h2>{{ plan.plan_name }}</h2>
+            <p>
+                {{ plan.start_date.strftime('%d %b %Y') }}
+                to
+                {{ plan.end_date.strftime('%d %b %Y') }}
+            </p>
+
+            <!-- Form to add a meal to the plan -->
+            <div class="recipe-card">
+                <h3>Add a Meal</h3>
+
+                <form method="POST" action="{{ url_for('add_meal') }}">
+
+                    <input type="hidden" name="plan_id" value="{{ plan.plan_id }}">
+
+                    <label>Recipe:</label><br>
+                    <select name="recipe_id" required>
+                        {% for r in all_recipes %}
+                            <option value="{{ r.recipe_id }}">{{ r.recipe_name }}</option>
+                        {% endfor %}
+                    </select>
+
+                    <br><br>
+
+                    <label>Day:</label><br>
+                    <select name="meal_date" required>
+                        {% for day in days %}
+                            <option value="{{ day.date }}">{{ day.label }}</option>
+                        {% endfor %}
+                    </select>
+
+                    <br><br>
+
+                    <label>Meal:</label><br>
+                    <select name="meal_type" required>
+                        <option value="Breakfast">Breakfast</option>
+                        <option value="Lunch">Lunch</option>
+                        <option value="Dinner">Dinner</option>
+                        <option value="Snack">Snack</option>
+                    </select>
+
+                    <br><br>
+
+                    <button type="submit">Add Meal</button>
+                </form>
+            </div>
+
+            <!-- One card per day -->
+            {% for day in days %}
+                <div class="recipe-card">
+                    <h3>{{ day.label }}</h3>
+
+                    {% for meal in day.meals %}
+                        <p>
+                            <strong>{{ meal.meal_type }}:</strong>
+                            <a href="{{ url_for('recipe_detail', recipe_id=meal.recipe_id) }}">{{ meal.recipe_name }}</a>
+
+                            <form method="POST" action="{{ url_for('remove_meal', item_id=meal.item_id) }}"
+                                  style="display: inline;">
+                                <button type="submit" style="padding: 4px 10px; background-color: #b23b3b;">Remove</button>
+                            </form>
+                        </p>
+                    {% else %}
+                        <p>Nothing planned.</p>
+                    {% endfor %}
+                </div>
+            {% endfor %}
+        {% else %}
+            <p>You have no meal plan yet.</p>
+        {% endif %}
+
+    </main>
+
+</body>
+</html>

@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Browse Recipes</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+
+<body>
+
+    <nav>
+        <a href="/">Home</a>
+        <a href="/recipes">Browse Recipes</a>
+        <a href="/add-recipe">Add Recipe</a>
+        <a href="/favorites">Favorites</a>
+        <a href="/meal-planner">Meal Planner</a>
+    </nav>
+
+    <header>
+        <h1>Explore Recipes</h1>
+        <p>Find delicious recipes for your meals.</p>
+    </header>
+
+    <main>
+        <h2>Find Your Recipe</h2>
+
+        <form method="GET" action="/recipes">
+
+            <label>Search:</label><br>
+            <input type="text" name="search" maxlength="100"
+                   placeholder="Recipe name or ingredient"
+                   value="{{ search }}">
+
+            <br><br>
+
+            <label>Difficulty:</label>
+            <select name="difficulty">
+                <option value="All" {% if difficulty == 'All' %}selected{% endif %}>All</option>
+                <option value="Easy" {% if difficulty == 'Easy' %}selected{% endif %}>Easy</option>
+                <option value="Medium" {% if difficulty == 'Medium' %}selected{% endif %}>Medium</option>
+                <option value="Hard" {% if difficulty == 'Hard' %}selected{% endif %}>Hard</option>
+            </select>
+
+            <br><br>
+
+            <label>Maximum Cooking Time:</label>
+            <select name="max_time">
+                <option value="Any" {% if max_time == 'Any' %}selected{% endif %}>Any</option>
+                <option value="20" {% if max_time == '20' %}selected{% endif %}>20 minutes</option>
+                <option value="30" {% if max_time == '30' %}selected{% endif %}>30 minutes</option>
+                <option value="60" {% if max_time == '60' %}selected{% endif %}>60 minutes</option>
+            </select>
+
+            <br><br>
+
+            <button type="submit">Search / Filter</button>
+            <a href="/recipes" style="margin-left: 12px;">Clear</a>
+
+        </form>
+
+        <h2>Available Recipes ({{ recipes|length }})</h2>
+
+        {% for recipe in recipes %}
+            <div class="recipe-card">
+                <h3>{{ recipe.recipe_name }}</h3>
+                <p>{{ recipe.description }}</p>
+                <p>Cooking Time: {{ recipe.cooking_time }} minutes</p>
+                <p>Difficulty: {{ recipe.difficulty }}</p>
+                <a href="{{ url_for('recipe_detail', recipe_id=recipe.recipe_id) }}">View Details</a>
+            </div>
+        {% else %}
+            <p>No recipes found.</p>
+        {% endfor %}
+
+    </main>
+
+</body>
+</html>

@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Add Recipe</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+
+<body>
+
+    <nav>
+        <a href="/">Home</a>
+        <a href="/recipes">Browse Recipes</a>
+        <a href="/add-recipe">Add Recipe</a>
+        <a href="/favorites">Favorites</a>
+        <a href="/meal-planner">Meal Planner</a>
+    </nav>
+
+    <header>
+        <h1>Add a New Recipe</h1>
+        <p>Share your recipe with everyone.</p>
+    </header>
+
+    <main>
+
+        {% if error %}
+            <p style="color: red;">{{ error }}</p>
+        {% endif %}
+
+        <form method="POST" action="/add-recipe">
+
+            <label>Recipe Name:</label><br>
+            <input type="text" name="recipe_name" maxlength="150" required
+                   value="{{ form.get('recipe_name', '') }}">
+
+            <br><br>
+
+            <label>Description:</label><br>
+            <textarea name="description" rows="3" cols="40">{{ form.get('description', '') }}</textarea>
+
+            <br><br>
+
+            <label>Cooking Time (minutes):</label><br>
+            <input type="number" name="cooking_time" min="1" required
+                   value="{{ form.get('cooking_time', '') }}">
+
+            <br><br>
+
+            <label>Difficulty:</label><br>
+            <select name="difficulty">
+                <option value="Easy" {% if form.get('difficulty') == 'Easy' %}selected{% endif %}>Easy</option>
+                <option value="Medium" {% if form.get('difficulty') == 'Medium' %}selected{% endif %}>Medium</option>
+                <option value="Hard" {% if form.get('difficulty') == 'Hard' %}selected{% endif %}>Hard</option>
+            </select>
+
+            <br><br>
+
+            <label>Ingredients:</label>
+            <div id="ingredient-list">
+                {% for row in ingredient_rows %}
+                    <div class="ingredient-row" style="margin-bottom: 8px;">
+                        <input type="text" name="ingredient_name" maxlength="100"
+                               placeholder="Ingredient (e.g. Cheese)" value="{{ row[0] }}">
+                        <input type="text" name="quantity" maxlength="50"
+                               placeholder="Quantity (e.g. 200 grams)" value="{{ row[1] }}">
+                        <button type="button" onclick="removeRow(this)">Remove</button>
+                    </div>
+                {% endfor %}
+            </div>
+            <button type="button" onclick="addRow()">+ Add another ingredient</button>
+
+            <br><br>
+
+            <label>Instructions:</label><br>
+            <textarea name="instructions" rows="6" cols="40">{{ form.get('instructions', '') }}</textarea>
+
+            <br><br>
+
+            <button type="submit">Save Recipe</button>
+
+        </form>
+
+    </main>
+
+    <script>
+        // Adds one new empty ingredient row to the page
+        function addRow() {
+            var list = document.getElementById('ingredient-list');
+            var row = document.createElement('div');
+            row.className = 'ingredient-row';
+            row.style.marginBottom = '8px';
+            row.innerHTML =
+                '<input type="text" name="ingredient_name" maxlength="100" placeholder="Ingredient (e.g. Cheese)"> ' +
+                '<input type="text" name="quantity" maxlength="50" placeholder="Quantity (e.g. 200 grams)"> ' +
+                '<button type="button" onclick="removeRow(this)">Remove</button>';
+            list.appendChild(row);
+        }
+
+        // Removes the row whose Remove button was clicked
+        function removeRow(button) {
+            button.parentElement.remove();
+        }
+    </script>
+
+</body>
+</html>
